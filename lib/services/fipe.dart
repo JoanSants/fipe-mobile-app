@@ -24,7 +24,7 @@ class Modelo {
 
 class VehicleModelsData {
   List<Ano> anos = [];
-  List<Object> modelos = [];
+  List<Modelo> modelos = [];
 
   VehicleModelsData({ this.anos, this.modelos });
 }
@@ -34,8 +34,10 @@ class Fipe {
   String brandCode = '';
   List<Brand> brands = [];
   VehicleModelsData vehicleModelsData;
+  int vehicleCode = 0;
+  List<Ano> years = [];
 
-  Fipe({ this.vehicleType, this.brandCode });
+  Fipe({ this.vehicleType, this.brandCode, this.vehicleCode });
 
   Future<void> fetchBrands () async {
     http.Response response = await http.get(Uri.https('parallelum.com.br', '/fipe/api/v1/${this.vehicleType}/marcas'));
@@ -49,5 +51,11 @@ class Fipe {
     List<Ano> anos = (vehicleData['anos'] as List).map((ano) => Ano(nome: ano['nome'], codigo: ano['codigo'])).toList();
     List<Modelo> modelos = (vehicleData['modelos'] as List).map((modelo) => Modelo(nome: modelo['nome'], codigo: modelo['codigo'])).toList();
     vehicleModelsData = VehicleModelsData(anos: anos, modelos: modelos);
+  }
+
+  Future<void> fetchVehicleYear () async {
+    http.Response response = await http.get(Uri.https('parallelum.com.br', '/fipe/api/v1/${vehicleType}/marcas/${brandCode}/modelos/${vehicleCode}/anos'));
+    List<dynamic> json = jsonDecode(response.body);
+    years = json.map((year) => Ano(nome: year['nome'], codigo: year['codigo'])).toList();
   }
 }

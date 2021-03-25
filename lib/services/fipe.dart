@@ -2,38 +2,37 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class Brand {
-  String nome = '';
-  String codigo = '';
+  String name = '';
+  String code = '';
 
-  Brand({ this.nome, this.codigo });
+  Brand({this.name, this.code});
 }
 
-class Ano {
-  String nome;
-  String codigo;
+class Year {
+  String name;
+  String code;
 
-  Ano({ this.nome, this.codigo });
+  Year({this.name, this.code});
 }
 
-class Modelo {
-  String nome;
-  int codigo;
+class VehicleModel {
+  String name;
+  int code;
 
-  Modelo({ this.nome, this.codigo });
+  VehicleModel({this.name, this.code});
 }
 
 class VehicleModelsData {
-  List<Ano> anos = [];
-  List<Modelo> modelos = [];
+  List<VehicleModel> vehicleModels = [];
 
-  VehicleModelsData({ this.anos, this.modelos });
+  VehicleModelsData({this.vehicleModels});
 }
 
 class VehicleDataInfo {
   String label;
   String value;
 
-  VehicleDataInfo({ this.label, this.value });
+  VehicleDataInfo({this.label, this.value});
 }
 
 class Fipe {
@@ -42,69 +41,55 @@ class Fipe {
   List<Brand> brands = [];
   VehicleModelsData vehicleModelsData;
   int vehicleCode = 0;
-  List<Ano> years = [];
+  List<Year> years = [];
   String yearCode = '';
   List<VehicleDataInfo> vehicleData;
 
-  Fipe({ this.vehicleType, this.brandCode, this.vehicleCode, this.yearCode });
+  Fipe({this.vehicleType, this.brandCode, this.vehicleCode, this.yearCode});
 
-  Future<void> fetchBrands () async {
-    http.Response response = await http.get(Uri.https('parallelum.com.br', '/fipe/api/v1/${this.vehicleType}/marcas'));
+  Future<void> fetchBrands() async {
+    http.Response response = await http.get(Uri.https(
+        'parallelum.com.br', '/fipe/api/v1/${this.vehicleType}/marcas'));
     List<dynamic> fetchedBrands = jsonDecode(response.body);
-    brands = fetchedBrands.map((brand) => Brand(nome: brand['nome'], codigo: brand['codigo'])).toList();
+    brands = fetchedBrands
+        .map((brand) => Brand(name: brand['nome'], code: brand['codigo']))
+        .toList();
   }
 
-  Future<void> fetchVehicleModelsData () async {
-    http.Response response = await http.get(Uri.https('parallelum.com.br', '/fipe/api/v1/${vehicleType}/marcas/${brandCode}/modelos'));
-    Map<String, dynamic> vehicleData = jsonDecode(response.body);
-    List<Ano> anos = (vehicleData['anos'] as List).map((ano) => Ano(nome: ano['nome'], codigo: ano['codigo'])).toList();
-    List<Modelo> modelos = (vehicleData['modelos'] as List).map((modelo) => Modelo(nome: modelo['nome'], codigo: modelo['codigo'])).toList();
-    vehicleModelsData = VehicleModelsData(anos: anos, modelos: modelos);
+  Future<void> fetchBrandVehicles() async {
+    http.Response response = await http.get(Uri.https('parallelum.com.br',
+        '/fipe/api/v1/${vehicleType}/marcas/${brandCode}/modelos'));
+    Map<String, dynamic> brandVehicles = jsonDecode(response.body);
+    List<VehicleModel> vehicleModels = (brandVehicles['modelos'] as List)
+        .map((modelo) =>
+            VehicleModel(name: modelo['nome'], code: modelo['codigo']))
+        .toList();
+    vehicleModelsData = VehicleModelsData(vehicleModels: vehicleModels);
   }
 
-  Future<void> fetchVehicleYear () async {
-    http.Response response = await http.get(Uri.https('parallelum.com.br', '/fipe/api/v1/${vehicleType}/marcas/${brandCode}/modelos/${vehicleCode}/anos'));
-    List<dynamic> json = jsonDecode(response.body);
-    years = json.map((year) => Ano(nome: year['nome'], codigo: year['codigo'])).toList();
+  Future<void> fetchVehicleYear() async {
+    http.Response response = await http.get(Uri.https('parallelum.com.br',
+        '/fipe/api/v1/${vehicleType}/marcas/${brandCode}/modelos/${vehicleCode}/anos'));
+    List<dynamic> vehicleYears = jsonDecode(response.body);
+    years = vehicleYears
+        .map((year) => Year(name: year['nome'], code: year['codigo']))
+        .toList();
   }
 
   // GET: https://
 
-  Future<void> fetchVehicleData () async {
-    http.Response response = await http.get(Uri.https(
-        'parallelum.com.br',
-        '/fipe/api/v1/${vehicleType}/marcas/${brandCode}/modelos/${vehicleCode}/anos/${yearCode}'
-    ));
+  Future<void> fetchVehicleData() async {
+    http.Response response = await http.get(Uri.https('parallelum.com.br',
+        '/fipe/api/v1/${vehicleType}/marcas/${brandCode}/modelos/${vehicleCode}/anos/${yearCode}'));
     Map<String, dynamic> json = jsonDecode(response.body);
     vehicleData = [
-      VehicleDataInfo(
-          label: 'Valor',
-          value: json['Valor']
-      ),
-      VehicleDataInfo(
-          label: 'Marca',
-          value: json['Marca']
-      ),
-      VehicleDataInfo(
-          label: 'Modelo',
-          value: json['Modelo']
-      ),
-      VehicleDataInfo(
-          label: 'Ano',
-          value: json['AnoModelo'].toString()
-      ),
-      VehicleDataInfo(
-          label: 'Combustível',
-          value: json['Combustivel']
-      ),
-      VehicleDataInfo(
-          label: 'Código Fipe',
-          value: json['CodigoFipe']
-      ),
-      VehicleDataInfo(
-          label: 'Mês Referência',
-          value: json['MesReferencia']
-      ),
+      VehicleDataInfo(label: 'Valor', value: json['Valor']),
+      VehicleDataInfo(label: 'Marca', value: json['Marca']),
+      VehicleDataInfo(label: 'Modelo', value: json['Modelo']),
+      VehicleDataInfo(label: 'Ano', value: json['AnoModelo'].toString()),
+      VehicleDataInfo(label: 'Combustível', value: json['Combustivel']),
+      VehicleDataInfo(label: 'Código Fipe', value: json['CodigoFipe']),
+      VehicleDataInfo(label: 'Mês Referência', value: json['MesReferencia']),
     ];
   }
 }

@@ -13,9 +13,12 @@ class _BrandsState extends State<Brands> {
   String selectedBrandName = '';
   String vehicleType = '';
 
-  void fetchModels () async {
-    Fipe fipe = new Fipe(brandCode: brands.firstWhere((brand) => brand.nome == selectedBrandName).codigo, vehicleType: vehicleType);
-    await fipe.fetchVehicleModelsData();
+  void fetchModels() async {
+    Fipe fipe = new Fipe(
+        brandCode:
+            brands.firstWhere((brand) => brand.name == selectedBrandName).code,
+        vehicleType: vehicleType);
+    await fipe.fetchBrandVehicles();
     Navigator.pushNamed(context, '/models', arguments: {
       'vehicleType': fipe.vehicleType,
       'brandCode': fipe.brandCode,
@@ -34,10 +37,8 @@ class _BrandsState extends State<Brands> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-            'Marcas'.toUpperCase(),
-            style: TextStyle(
-              letterSpacing: 8
-            ),
+          'Marcas'.toUpperCase(),
+          style: TextStyle(letterSpacing: 8),
         ),
       ),
       body: Padding(
@@ -47,21 +48,24 @@ class _BrandsState extends State<Brands> {
           children: [
             Text('Selecione a marca:'.toUpperCase()),
             DropdownButton<String>(
-                value: selectedBrandName.isNotEmpty ? selectedBrandName : brands[0].nome,
+                value: selectedBrandName.isNotEmpty
+                    ? selectedBrandName
+                    : brands[0].name,
                 onChanged: (String newValue) => {
-                  setState(() => {
-                    selectedBrandName = newValue
-                  })
-                },
-                items: brands.map<DropdownMenuItem<String>>((brand) => (
-                    DropdownMenuItem<String>(
-                      child: Text(brand.nome),
-                      value: brand.nome,
-                    )
-                )).toList()
-            ),
+                      setState(() => {selectedBrandName = newValue})
+                    },
+                items: brands
+                    .map<DropdownMenuItem<String>>(
+                        (brand) => (DropdownMenuItem<String>(
+                              child: Text(brand.name),
+                              value: brand.name,
+                            )))
+                    .toList()),
             SizedBox(height: 20),
-            Button(disabled: selectedBrandName.isEmpty, label: 'Buscar Modelos', onPressed: fetchModels)
+            Button(
+                disabled: selectedBrandName.isEmpty,
+                label: 'Buscar Modelos',
+                onPressed: fetchModels)
           ],
         ),
       ),

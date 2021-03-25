@@ -11,15 +11,20 @@ class _VehicleModelsState extends State<VehicleModels> {
   Map urlData = {};
   String selectedModel = '';
   String selectedYear = '';
-
-  void fetchModelInfo () {
-
-  }
+  List<Ano> vehicleYears = [];
 
   @override
   Widget build(BuildContext context) {
     urlData = ModalRoute.of(context).settings.arguments;
     VehicleModelsData vehicleModelsData = urlData['vehicleModelsData'];
+
+    void fetchVehicleYear () async {
+      Fipe fipe = Fipe(brandCode: urlData['brandCode'], vehicleType: urlData['vehicleType'], vehicleCode: vehicleModelsData.modelos.firstWhere((model) => model.nome == selectedModel).codigo);
+      await fipe.fetchVehicleYear();
+      setState(() {
+        vehicleYears = fipe.years;
+      });
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -47,27 +52,32 @@ class _VehicleModelsState extends State<VehicleModels> {
               )).toList(),
               onChanged: (String newValue) => {
                 setState(() => {
-                  selectedModel = newValue
+                  selectedModel = newValue,
+                  vehicleYears = []
                 })
               },
             ),
             SizedBox(height: 20),
-            Text('Selectione o ano:'.toUpperCase()),
-            DropdownButton(
-              value: selectedYear.isNotEmpty ? selectedYear : vehicleModelsData.anos[0].nome,
-              items: vehicleModelsData.anos.map((ano) => (
-                  DropdownMenuItem(
-                      child: Text(ano.nome),
-                      value: ano.nome
-                  )
-              )).toList(),
-              onChanged: (String newValue) => {
-                setState(() => {
-                  selectedYear = newValue
-                })
-              },
+            if (vehicleYears.length > 0) (
+                Text('Selectione o ano:'.toUpperCase())
             ),
-            Button(label: 'Buscar informações'.toUpperCase(), disabled: selectedModel.isEmpty || selectedYear.isEmpty, onPressed: fetchModelInfo)
+            if (vehicleYears.length > 0) (
+                DropdownButton(
+                  value: selectedYear.isNotEmpty ? selectedYear : vehicleYears[0].nome.toString(),
+                  items: vehicleYears.map((ano) => (
+                      DropdownMenuItem(
+                          child: Text(ano.nome),
+                          value: ano.nome
+                      )
+                  )).toList(),
+                  onChanged: (String newValue) => {
+                    setState(() => {
+                      selectedYear = newValue
+                    })
+                  },
+                )
+            ),
+            Button(label: 'Buscar anos'.toUpperCase(), disabled: selectedModel.isEmpty || selectedYear.isEmpty, onPressed: fetchVehicleYear)
           ],
         ),
       )

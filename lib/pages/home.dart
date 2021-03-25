@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fipe_mobile_app/services/fipe.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -7,7 +8,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<String> vehicleTypes = ['carros', 'motos'];
-  String vehicleDropDownValue = '';
+  String selectedVehicleType = '';
+
+  void fetchBrands () async {
+    Fipe fipe = new Fipe(selectedVehicleType);
+    await fipe.fetchBrands();
+    print(fipe.brands[0].nome);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +39,10 @@ class _HomeState extends State<Home> {
                 Text('Selecione o tipo de veículo:'.toUpperCase()),
                 SizedBox(width: 10),
                 DropdownButton<String>(
-                    value: vehicleDropDownValue.isNotEmpty ? vehicleDropDownValue : 'carros',
+                    value: selectedVehicleType.isNotEmpty ? selectedVehicleType : 'carros',
                     onChanged: (String newValue) => {
                       setState(() => {
-                        vehicleDropDownValue = newValue
+                        selectedVehicleType = newValue
                       })
                     },
                     items: vehicleTypes.map<DropdownMenuItem<String>>((String vehicleType) => (
@@ -50,11 +57,11 @@ class _HomeState extends State<Home> {
             SizedBox(
               width: double.maxFinite,
               child: ElevatedButton(
-                onPressed: () => {},
+                onPressed: () => fetchBrands(),
                 child: Text('Buscar'),
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(
-                      vehicleDropDownValue.isNotEmpty ?
+                      selectedVehicleType.isNotEmpty ?
                       Theme.of(context).primaryColor :
                       Theme.of(context).disabledColor
                   ),

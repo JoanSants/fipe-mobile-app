@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fipe_mobile_app/services/fipe.dart';
+import 'package:fipe_mobile_app/widgets/Button.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -13,7 +14,11 @@ class _HomeState extends State<Home> {
   void fetchBrands () async {
     Fipe fipe = new Fipe(selectedVehicleType);
     await fipe.fetchBrands();
-    print(fipe.brands[0].nome);
+    if (fipe.brands.length > 0) {
+      Navigator.pushNamed(context, '/brands', arguments: {
+        'brands': fipe.brands
+      });
+    }
   }
 
   @override
@@ -22,7 +27,7 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'Tabela Fipe'.toUpperCase(),
+          'Veículos'.toUpperCase(),
           style: TextStyle(
               letterSpacing: 8
           ),
@@ -33,41 +38,24 @@ class _HomeState extends State<Home> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Selecione o tipo de veículo:'.toUpperCase()),
-                SizedBox(width: 10),
-                DropdownButton<String>(
-                    value: selectedVehicleType.isNotEmpty ? selectedVehicleType : 'carros',
-                    onChanged: (String newValue) => {
-                      setState(() => {
-                        selectedVehicleType = newValue
-                      })
-                    },
-                    items: vehicleTypes.map<DropdownMenuItem<String>>((String vehicleType) => (
-                        DropdownMenuItem<String>(
-                          child: Text(vehicleType.toUpperCase()),
-                          value: vehicleType,
-                        )
-                    )).toList()
-                ),
-              ],
+            Text('Selecione o tipo de veículo:'.toUpperCase()),
+            SizedBox(width: 10),
+            DropdownButton<String>(
+                value: selectedVehicleType.isNotEmpty ? selectedVehicleType : 'carros',
+                onChanged: (String newValue) => {
+                  setState(() => {
+                    selectedVehicleType = newValue
+                  })
+                },
+                items: vehicleTypes.map<DropdownMenuItem<String>>((String vehicleType) => (
+                    DropdownMenuItem<String>(
+                      child: Text(vehicleType.toUpperCase()),
+                      value: vehicleType,
+                    )
+                )).toList()
             ),
-            SizedBox(
-              width: double.maxFinite,
-              child: ElevatedButton(
-                onPressed: () => fetchBrands(),
-                child: Text('Buscar'),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      selectedVehicleType.isNotEmpty ?
-                      Theme.of(context).primaryColor :
-                      Theme.of(context).disabledColor
-                  ),
-                ),
-              ),
-            )
+            SizedBox(height: 20),
+            Button(disabled: selectedVehicleType.isEmpty, label: 'Buscar Marcas', onPressed: fetchBrands)
           ],
         ),
       ),

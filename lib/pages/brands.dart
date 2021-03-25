@@ -11,11 +11,18 @@ class _BrandsState extends State<Brands> {
   Map urlData = {};
   List<Brand> brands = [];
   String selectedBrandName = '';
+  String vehicleType = '';
+
+  void fetchModels () async {
+    Fipe fipe = new Fipe(brandCode: brands.firstWhere((brand) => brand.nome == selectedBrandName).codigo, vehicleType: vehicleType);
+    await fipe.fetchVehicleModelsData();
+  }
 
   @override
   Widget build(BuildContext context) {
     urlData = ModalRoute.of(context).settings.arguments;
     brands = urlData['brands'];
+    vehicleType = urlData['vehicleType'];
 
     return Scaffold(
       appBar: AppBar(
@@ -48,7 +55,7 @@ class _BrandsState extends State<Brands> {
                 )).toList()
             ),
             SizedBox(height: 20),
-            Button(disabled: selectedBrandName.isEmpty, label: 'Buscar Modelos')
+            Button(disabled: selectedBrandName.isEmpty, label: 'Buscar Modelos', onPressed: fetchModels)
           ],
         ),
       ),

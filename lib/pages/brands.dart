@@ -16,6 +16,12 @@ class _BrandsState extends State<Brands> {
   void fetchModels () async {
     Fipe fipe = new Fipe(brandCode: brands.firstWhere((brand) => brand.nome == selectedBrandName).codigo, vehicleType: vehicleType);
     await fipe.fetchVehicleModelsData();
+    Navigator.pushNamed(context, '/models', arguments: {
+      'vehicleType': fipe.vehicleType,
+      'brandCode': fipe.brandCode,
+      'brands': fipe.brands,
+      'vehicleModelsData': fipe.vehicleModelsData
+    });
   }
 
   @override
@@ -39,7 +45,7 @@ class _BrandsState extends State<Brands> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Selecione a marca desejada:'),
+            Text('Selecione a marca:'.toUpperCase()),
             DropdownButton<String>(
                 value: selectedBrandName.isNotEmpty ? selectedBrandName : brands[0].nome,
                 onChanged: (String newValue) => {

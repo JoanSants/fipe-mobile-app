@@ -26,6 +26,19 @@ class _VehicleModelsState extends State<VehicleModels> {
       });
     }
 
+    void fetchVehicleData () async {
+      Fipe fipe = Fipe(
+          brandCode: urlData['brandCode'],
+          vehicleType: urlData['vehicleType'],
+          vehicleCode: vehicleModelsData.modelos.firstWhere((model) => model.nome == selectedModel).codigo,
+          yearCode: vehicleYears.firstWhere((year) => year.nome == selectedYear).codigo
+      );
+      await fipe.fetchVehicleData();
+      Navigator.pushNamed(context, '/details', arguments: {
+        'globalFipe': fipe
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -77,7 +90,12 @@ class _VehicleModelsState extends State<VehicleModels> {
                   },
                 )
             ),
-            Button(label: 'Buscar anos'.toUpperCase(), disabled: selectedModel.isEmpty || selectedYear.isEmpty, onPressed: fetchVehicleYear)
+            if (vehicleYears.length == 0) (
+                Button(label: 'Buscar anos'.toUpperCase(), disabled: selectedModel.isEmpty, onPressed: fetchVehicleYear)
+            ),
+            if (vehicleYears.length > 0) (
+                Button(label: 'Buscar informações'.toUpperCase(), disabled: selectedYear.isEmpty, onPressed: fetchVehicleData)
+            )
           ],
         ),
       )

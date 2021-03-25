@@ -12,11 +12,12 @@ class _HomeState extends State<Home> {
   String selectedVehicleType = '';
 
   void fetchBrands () async {
-    Fipe fipe = new Fipe(selectedVehicleType);
+    Fipe fipe = new Fipe(vehicleType: selectedVehicleType);
     await fipe.fetchBrands();
     if (fipe.brands.length > 0) {
       Navigator.pushNamed(context, '/brands', arguments: {
-        'brands': fipe.brands
+        'brands': fipe.brands,
+        'vehicleType': selectedVehicleType
       });
     }
   }

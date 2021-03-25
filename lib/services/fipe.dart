@@ -29,6 +29,13 @@ class VehicleModelsData {
   VehicleModelsData({ this.anos, this.modelos });
 }
 
+class VehicleDataInfo {
+  String label;
+  String value;
+
+  VehicleDataInfo({ this.label, this.value });
+}
+
 class Fipe {
   String vehicleType = '';
   String brandCode = '';
@@ -36,15 +43,17 @@ class Fipe {
   VehicleModelsData vehicleModelsData;
   int vehicleCode = 0;
   List<Ano> years = [];
+  String yearCode = '';
+  List<VehicleDataInfo> vehicleData;
 
-  Fipe({ this.vehicleType, this.brandCode, this.vehicleCode });
+  Fipe({ this.vehicleType, this.brandCode, this.vehicleCode, this.yearCode });
 
   Future<void> fetchBrands () async {
     http.Response response = await http.get(Uri.https('parallelum.com.br', '/fipe/api/v1/${this.vehicleType}/marcas'));
     List<dynamic> fetchedBrands = jsonDecode(response.body);
     brands = fetchedBrands.map((brand) => Brand(nome: brand['nome'], codigo: brand['codigo'])).toList();
   }
-  
+
   Future<void> fetchVehicleModelsData () async {
     http.Response response = await http.get(Uri.https('parallelum.com.br', '/fipe/api/v1/${vehicleType}/marcas/${brandCode}/modelos'));
     Map<String, dynamic> vehicleData = jsonDecode(response.body);
@@ -57,5 +66,45 @@ class Fipe {
     http.Response response = await http.get(Uri.https('parallelum.com.br', '/fipe/api/v1/${vehicleType}/marcas/${brandCode}/modelos/${vehicleCode}/anos'));
     List<dynamic> json = jsonDecode(response.body);
     years = json.map((year) => Ano(nome: year['nome'], codigo: year['codigo'])).toList();
+  }
+
+  // GET: https://
+
+  Future<void> fetchVehicleData () async {
+    http.Response response = await http.get(Uri.https(
+        'parallelum.com.br',
+        '/fipe/api/v1/${vehicleType}/marcas/${brandCode}/modelos/${vehicleCode}/anos/${yearCode}'
+    ));
+    Map<String, dynamic> json = jsonDecode(response.body);
+    vehicleData = [
+      VehicleDataInfo(
+          label: 'Valor',
+          value: json['Valor']
+      ),
+      VehicleDataInfo(
+          label: 'Marca',
+          value: json['Marca']
+      ),
+      VehicleDataInfo(
+          label: 'Modelo',
+          value: json['Modelo']
+      ),
+      VehicleDataInfo(
+          label: 'Ano',
+          value: json['AnoModelo'].toString()
+      ),
+      VehicleDataInfo(
+          label: 'Combustível',
+          value: json['Combustivel']
+      ),
+      VehicleDataInfo(
+          label: 'Código Fipe',
+          value: json['CodigoFipe']
+      ),
+      VehicleDataInfo(
+          label: 'Mês Referência',
+          value: json['MesReferencia']
+      ),
+    ];
   }
 }

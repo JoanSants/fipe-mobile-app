@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:fipe_mobile_app/services/fipe.dart';
 
 class Details extends StatelessWidget {
-  Fipe fipe;
+  List<VehicleDataInfo> vehicleData;
 
   @override
   Widget build(BuildContext context) {
     Map urlData = ModalRoute.of(context).settings.arguments;
-    Fipe fipe = urlData['globalFipe'];
+    vehicleData = urlData['vehicleData'];
 
     return Scaffold(
       appBar: AppBar(
@@ -22,12 +22,12 @@ class Details extends StatelessWidget {
         child: Center(
           child: ListView.builder(
               shrinkWrap: true,
-              itemCount: fipe.vehicleData.length,
+              itemCount: vehicleData.length,
               itemBuilder: (context, index) => (Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('${fipe.vehicleData[index].label}:'),
-                      Text(fipe.vehicleData[index].value.toString())
+                      Text('${vehicleData[index].label}:'),
+                      Text(vehicleData[index].value.toString())
                     ],
                   ))),
         ),

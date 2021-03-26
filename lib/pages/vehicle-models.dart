@@ -12,38 +12,37 @@ class _VehicleModelsState extends State<VehicleModels> {
   String selectedModel = '';
   String selectedYear = '';
   List<Year> vehicleYears = [];
+  VehicleModelsData vehicleModelsData;
+  int vehicleCode;
+
+  void fetchVehicleYear() async {
+    Fipe fipe = Fipe(
+        brandCode: urlData['brandCode'],
+        vehicleType: urlData['vehicleType'],
+        vehicleCode: vehicleCode);
+    await fipe.fetchVehicleYear();
+    setState(() {
+      vehicleYears = fipe.years;
+    });
+  }
+
+  void fetchVehicleData() async {
+    Fipe fipe = Fipe(
+        brandCode: urlData['brandCode'],
+        vehicleType: urlData['vehicleType'],
+        vehicleCode: vehicleCode,
+        yearCode:
+            vehicleYears.firstWhere((year) => year.name == selectedYear).code);
+    await fipe.fetchVehicleData();
+
+    Navigator.pushNamed(context, '/details',
+        arguments: {'vehicleData': fipe.vehicleData});
+  }
 
   @override
   Widget build(BuildContext context) {
     urlData = ModalRoute.of(context).settings.arguments;
-    VehicleModelsData vehicleModelsData = urlData['vehicleModelsData'];
-
-    void fetchVehicleYear() async {
-      Fipe fipe = Fipe(
-          brandCode: urlData['brandCode'],
-          vehicleType: urlData['vehicleType'],
-          vehicleCode: vehicleModelsData.vehicleModels
-              .firstWhere((model) => model.name == selectedModel)
-              .code);
-      await fipe.fetchVehicleYear();
-      setState(() {
-        vehicleYears = fipe.years;
-      });
-    }
-
-    void fetchVehicleData() async {
-      Fipe fipe = Fipe(
-          brandCode: urlData['brandCode'],
-          vehicleType: urlData['vehicleType'],
-          vehicleCode: vehicleModelsData.vehicleModels
-              .firstWhere((model) => model.name == selectedModel)
-              .code,
-          yearCode: vehicleYears
-              .firstWhere((year) => year.name == selectedYear)
-              .code);
-      await fipe.fetchVehicleData();
-      Navigator.pushNamed(context, '/details', arguments: {'globalFipe': fipe});
-    }
+    vehicleModelsData = urlData['vehicleModelsData'];
 
     return Scaffold(
         appBar: AppBar(
@@ -68,7 +67,13 @@ class _VehicleModelsState extends State<VehicleModels> {
                         child: Text(model.name), value: model.name)))
                     .toList(),
                 onChanged: (String newValue) => {
-                  setState(() => {selectedModel = newValue, vehicleYears = []})
+                  setState(() => {
+                        selectedModel = newValue,
+                        vehicleYears = [],
+                        vehicleCode = vehicleModelsData.vehicleModels
+                            .firstWhere((model) => model.name == selectedModel)
+                            .code
+                      })
                 },
               ),
               SizedBox(height: 20),

@@ -13,17 +13,17 @@ class _BrandsState extends State<Brands> {
   String selectedBrandName = '';
   String vehicleType = '';
 
-  void fetchModels() async {
+  void fetchBrandVehicles() async {
     Fipe fipe = new Fipe(
         brandCode:
             brands.firstWhere((brand) => brand.name == selectedBrandName).code,
         vehicleType: vehicleType);
     await fipe.fetchBrandVehicles();
+
     Navigator.pushNamed(context, '/models', arguments: {
-      'vehicleType': fipe.vehicleType,
       'brandCode': fipe.brandCode,
-      'brands': fipe.brands,
-      'vehicleModelsData': fipe.vehicleModelsData
+      'vehicleModelsData': fipe.vehicleModelsData,
+      'vehicleType': vehicleType
     });
   }
 
@@ -65,7 +65,7 @@ class _BrandsState extends State<Brands> {
             Button(
                 disabled: selectedBrandName.isEmpty,
                 label: 'Buscar Modelos',
-                onPressed: fetchModels)
+                onPressed: fetchBrandVehicles)
           ],
         ),
       ),
